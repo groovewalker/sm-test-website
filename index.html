@@ -87,14 +87,35 @@
       padding: 0.6rem 1.5rem;
       letter-spacing: 0.12em !important;
       font-size: 0.72rem !important;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
-      box-shadow: 0 0 0 0 var(--red-glow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s !important;
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.4),
+        0 2px 8px rgba(232,25,44,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.12) !important;
     }
 
+    .nav-cta::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+      transition: left 0.45s ease;
+      pointer-events: none;
+    }
+
+    .nav-cta:hover::before { left: 160%; }
+
     .nav-cta:hover {
-      background: #c41424 !important;
       transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(232,25,44,0.35) !important;
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.6),
+        0 4px 16px rgba(232,25,44,0.45),
+        0 8px 32px rgba(232,25,44,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.18) !important;
     }
 
     /* ── HERO ── */
@@ -224,13 +245,44 @@
       font-weight: 600;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s;
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.5),
+        0 2px 12px rgba(232,25,44,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.13);
     }
 
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+
+    .btn-primary:hover::before { left: 160%; }
+
     .btn-primary:hover {
-      background: #c41424;
       transform: translateY(-2px);
-      box-shadow: 0 10px 36px rgba(232,25,44,0.3);
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.7),
+        0 6px 20px rgba(232,25,44,0.5),
+        0 12px 48px rgba(232,25,44,0.28),
+        0 0 80px rgba(232,25,44,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.6),
+        0 2px 12px rgba(232,25,44,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.1);
     }
 
     .btn-ghost {
@@ -243,10 +295,52 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      transition: color 0.2s, gap 0.2s;
+      transition: color 0.2s, gap 0.2s, text-shadow 0.25s;
     }
 
-    .btn-ghost:hover { color: var(--text); gap: 0.9rem; }
+    .btn-ghost:hover {
+      color: var(--text);
+      gap: 0.9rem;
+      text-shadow: 0 0 18px rgba(255,255,255,0.25);
+    }
+
+    /* Pulsing glow on the CTA section primary button */
+    #cta-section .btn-primary {
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.55),
+        0 4px 20px rgba(232,25,44,0.4),
+        0 0 60px rgba(232,25,44,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.13);
+      animation: ctaPulse 2.8s ease-in-out infinite;
+    }
+
+    #cta-section .btn-primary:hover {
+      animation: none;
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 1px rgba(232,25,44,0.8),
+        0 8px 28px rgba(232,25,44,0.6),
+        0 16px 64px rgba(232,25,44,0.35),
+        0 0 100px rgba(232,25,44,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.22);
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 0 1px rgba(232,25,44,0.55),
+          0 4px 20px rgba(232,25,44,0.4),
+          0 0 60px rgba(232,25,44,0.15),
+          inset 0 1px 0 rgba(255,255,255,0.13);
+      }
+      50% {
+        box-shadow:
+          0 0 0 1px rgba(232,25,44,0.75),
+          0 6px 30px rgba(232,25,44,0.55),
+          0 0 90px rgba(232,25,44,0.25),
+          inset 0 1px 0 rgba(255,255,255,0.16);
+      }
+    }
 
     .hero-scroll-hint {
       position: absolute;
