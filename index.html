@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Score Maverick — Music for Animation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #E8192C;
+      --red-glow: rgba(232, 25, 44, 0.18);
+      --black: #0A0A0A;
+      --surface: #111111;
+      --elevated: #1A1A1A;
+      --border: rgba(255,255,255,0.07);
+      --text: #F0EBE3;
+      --muted: #5E5E5E;
+      --muted-light: #888;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Film grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9998;
+      mix-blend-mode: overlay;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      padding: 1.4rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s, border-color 0.4s;
+      border-bottom: 1px solid transparent;
+    }
+
+    nav.scrolled {
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(16px);
+      border-color: var(--border);
+    }
+
+    nav img.nav-logo { height: 30px; }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted-light);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--red) !important;
+      color: white !important;
+      padding: 0.6rem 1.5rem;
+      letter-spacing: 0.12em !important;
+      font-size: 0.72rem !important;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
+      box-shadow: 0 0 0 0 var(--red-glow);
+    }
+
+    .nav-cta:hover {
+      background: #c41424 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(232,25,44,0.35) !important;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      height: 100vh;
+      min-height: 720px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #dots-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Staff line texture */
+    .hero-iso-mark {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 600px;
+      opacity: 0.04;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .staff-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          180deg,
+          transparent 0px,
+          transparent 22px,
+          rgba(255,255,255,0.022) 22px,
+          rgba(255,255,255,0.022) 23px
+        );
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      padding: 0 3rem;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.75rem;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 1px;
+      background: var(--red);
+    }
+
+    .hero-h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 13vw, 12rem);
+      line-height: 0.88;
+      letter-spacing: 0.01em;
+      opacity: 0;
+      transform: translateY(28px);
+      animation: fadeUp 1s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+    }
+
+    .hero-h1 .accent { color: var(--red); display: block; }
+
+    .hero-sub {
+      margin-top: 2rem;
+      font-size: 1.05rem;
+      color: var(--muted-light);
+      max-width: 400px;
+      line-height: 1.75;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.75s forwards;
+    }
+
+    .hero-actions {
+      margin-top: 2.75rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.95s forwards;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.25s;
+    }
+
+    .btn-primary:hover {
+      background: #c41424;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 36px rgba(232,25,44,0.3);
+    }
+
+    .btn-ghost {
+      color: var(--muted-light);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: color 0.2s, gap 0.2s;
+    }
+
+    .btn-ghost:hover { color: var(--text); gap: 0.9rem; }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      animation: fadeUp 1s 1.4s forwards;
+    }
+
+    .scroll-track {
+      width: 36px;
+      height: 1px;
+      background: var(--elevated);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-track::after {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--red);
+      animation: trackSlide 2.2s 1.8s infinite ease-in-out;
+    }
+
+    /* ── STATS ── */
+    #stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat {
+      padding: 2.75rem 2rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.8rem;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-lbl {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── SHARED SECTION STYLES ── */
+    .sec {
+      padding: 7rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .sec-divider {
+      border-top: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.25rem;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--red);
+    }
+
+    .sec-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── SERVICES ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 4rem;
+      background: var(--border);
+    }
+
+    .srv-card {
+      background: var(--black);
+      padding: 3rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .srv-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--red);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .srv-card:hover::after { transform: scaleX(1); }
+    .srv-card:hover { background: var(--surface); }
+
+    .srv-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5.5rem;
+      color: rgba(255,255,255,0.03);
+      line-height: 1;
+      margin-bottom: 1.25rem;
+      transition: color 0.35s;
+    }
+    .srv-card:hover .srv-num { color: rgba(232,25,44,0.07); }
+
+    .srv-icon { color: var(--red); margin-bottom: 1.5rem; }
+
+    .srv-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.9rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .srv-desc {
+      font-size: 0.875rem;
+      color: var(--muted-light);
+      line-height: 1.75;
+    }
+
+    /* ── WORK ── */
+    .work-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+    }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 2px;
+      height: 580px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .work-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .work-item.featured { grid-row: 1 / 3; }
+
+    .work-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s cubic-bezier(0.16,1,0.3,1), filter 0.4s;
+      filter: grayscale(50%) contrast(1.1) brightness(0.9);
+    }
+
+    .work-item:hover .work-thumb {
+      transform: scale(1.05);
+      filter: grayscale(10%) contrast(1.05) brightness(1.0);
+    }
+
+    .work-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 35%, rgba(10,10,10,0.92) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.75rem;
+    }
+
+    .work-tag {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.35rem;
+    }
+
+    .work-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.04em;
+    }
+
+    .featured .work-title { font-size: 2rem; }
+
+    .play-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.75);
+      opacity: 0;
+      width: 60px;
+      height: 60px;
+      border: 1.5px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(232,25,44,0.15);
+      backdrop-filter: blur(6px);
+      transition: opacity 0.3s, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .work-item:hover .play-ring {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      margin-top: 4rem;
+    }
+
+    .about-visual {
+      position: relative;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+
+    .about-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(30%) contrast(1.1);
+      transition: transform 0.7s;
+    }
+
+    .about-visual:hover .about-img { transform: scale(1.03); }
+
+    .about-red-layer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(232,25,44,0.12) 0%, transparent 55%);
+      mix-blend-mode: screen;
+    }
+
+    .about-corner {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 64px;
+      height: 64px;
+      background: var(--red);
+    }
+
+    .about-text .sec-title { margin-bottom: 2rem; }
+
+    .about-text p {
+      font-size: 0.95rem;
+      color: var(--muted-light);
+      line-height: 1.8;
+      margin-bottom: 1.4rem;
+    }
+
+    .about-text p strong { color: var(--text); font-weight: 500; }
+
+    /* ── PROCESS ── */
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2.5rem;
+      margin-top: 4rem;
+    }
+
+    .proc-step {}
+
+    .proc-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      color: var(--red);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .proc-num::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .proc-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .proc-desc {
+      font-size: 0.865rem;
+      color: var(--muted-light);
+      line-height: 1.75;
+    }
+
+    /* ── CTA BANNER ── */
+    #cta-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      padding: 9rem 3rem;
+      text-align: center;
+    }
+
+    .cta-iso-mark {
+      position: absolute;
+      right: -60px;
+      bottom: -40px;
+      width: 520px;
+      opacity: 0.04;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .cta-glow {
+      position: absolute;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(232,25,44,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 7vw, 6.5rem);
+      line-height: 0.9;
+      letter-spacing: 0.01em;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-sub {
+      font-size: 0.975rem;
+      color: var(--muted-light);
+      line-height: 1.75;
+      margin-bottom: 3rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2.25rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+
+    footer img { height: 21px; opacity: 0.55; }
+
+    .footer-social {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-social a {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-social a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes trackSlide {
+      0% { left: -100%; }
+      100% { left: 110%; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    .d1 { transition-delay: 0.1s; }
+    .d2 { transition-delay: 0.2s; }
+    .d3 { transition-delay: 0.3s; }
+    .d4 { transition-delay: 0.4s; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <img src="brand_assets/Score_Maverick_Logo_White_Fin.png" alt="Score Maverick" class="nav-logo">
+  <ul class="nav-links">
+    <li><a href="#services-sec">Services</a></li>
+    <li><a href="#work-sec">Work</a></li>
+    <li><a href="#about-sec">About</a></li>
+    <li><a href="#process-sec">Process</a></li>
+    <li><a href="#cta-section" class="nav-cta">Work With Us</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="dots-canvas"></canvas>
+  <div class="staff-bg"></div>
+  <canvas id="hero-canvas"></canvas>
+  <img src="brand_assets/Score_Maverick_Logo_Iso_White_Fin.png" alt="" class="hero-iso-mark" aria-hidden="true">
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Original Music for Animation</div>
+    <h1 class="hero-h1">
+      WHERE<br>
+      SOUND<br>
+      <span class="accent">MEETS</span>
+      STORY
+    </h1>
+    <p class="hero-sub">
+      Cinematic scores and bespoke soundscapes crafted to bring animated worlds to life.
+    </p>
+    <div class="hero-actions">
+      <a href="#work-sec" class="btn-primary">View Our Work</a>
+      <a href="#cta-section" class="btn-ghost">
+        Start a Project
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <div class="scroll-track"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="stat reveal">
+    <div class="stat-num">120+</div>
+    <div class="stat-lbl">Projects Scored</div>
+  </div>
+  <div class="stat reveal d1">
+    <div class="stat-num">8</div>
+    <div class="stat-lbl">Years in Production</div>
+  </div>
+  <div class="stat reveal d2">
+    <div class="stat-num">40+</div>
+    <div class="stat-lbl">Studio Partners</div>
+  </div>
+  <div class="stat reveal d3">
+    <div class="stat-num">3×</div>
+    <div class="stat-lbl">Award Nominated</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div class="sec-divider">
+  <div class="sec" id="services-sec">
+    <div class="eyebrow reveal">What We Do</div>
+    <h2 class="sec-title reveal">CRAFTING EVERY<br>SONIC DIMENSION</h2>
+
+    <div class="services-grid reveal">
+      <div class="srv-card">
+        <div class="srv-num">01</div>
+        <div class="srv-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 18V5l12-2v13"/>
+            <circle cx="6" cy="18" r="3"/>
+            <circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <div class="srv-name">Original Score</div>
+        <p class="srv-desc">Full orchestral and hybrid compositions tailored to your project's emotional arc. Every cue, every beat, every breath — composed from scratch for your world.</p>
+      </div>
+      <div class="srv-card">
+        <div class="srv-num">02</div>
+        <div class="srv-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+          </svg>
+        </div>
+        <div class="srv-name">Sound Design</div>
+        <p class="srv-desc">Immersive sonic environments that give depth to your world. From creature voices to ambient textures — the sounds that make audiences believe.</p>
+      </div>
+      <div class="srv-card">
+        <div class="srv-num">03</div>
+        <div class="srv-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="srv-name">Music Supervision</div>
+        <p class="srv-desc">Strategic curation and licensing of existing music alongside original scores. Every track placed with precision, purpose, and creative intent.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WORK -->
+<div class="sec-divider">
+  <div class="sec" id="work-sec">
+    <div class="work-header">
+      <div>
+        <div class="eyebrow reveal">Selected Work</div>
+        <h2 class="sec-title reveal">OUR<br>REEL</h2>
+      </div>
+      <a href="#" class="btn-ghost reveal" style="margin-bottom: 0.4rem;">
+        View All Projects
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="work-grid reveal">
+      <div class="work-item featured">
+        <img src="https://placehold.co/800x1080/0e0e0e/1e1e1e?text=★" alt="The Hollow Kingdom" class="work-thumb">
+        <div class="work-overlay">
+          <div class="work-tag">Feature Film · 2024</div>
+          <div class="work-title">The Hollow Kingdom</div>
+        </div>
+        <div class="play-ring">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="https://placehold.co/600x340/0d0d0d/1a1a1a?text=▶" alt="Neon Drift" class="work-thumb">
+        <div class="work-overlay">
+          <div class="work-tag">TV Series · 2024</div>
+          <div class="work-title">Neon Drift</div>
+        </div>
+        <div class="play-ring">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="https://placehold.co/600x340/121212/222222?text=▶" alt="Tide Walkers" class="work-thumb">
+        <div class="work-overlay">
+          <div class="work-tag">Short Film · 2023</div>
+          <div class="work-title">Tide Walkers</div>
+        </div>
+        <div class="play-ring">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
+      </div>
+      <div class="work-item">
+        <img src="https://placehold.co/600x340/0f0f0f/202020?text=▶" alt="Ember City" class="work-thumb">
+        <div class="work-overlay">
+          <div class="work-tag">Streaming · 2023</div>
+          <div class="work-title">Ember City</div>
+        </div>
+        <div class="play-ring">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="sec-divider">
+  <div class="sec" id="about-sec">
+    <div class="eyebrow reveal">Our Studio</div>
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <img src="https://placehold.co/720x540/111111/232323?text=STUDIO" alt="Score Maverick Studio" class="about-img">
+        <div class="about-red-layer"></div>
+        <div class="about-corner"></div>
+      </div>
+      <div class="about-text reveal d2">
+        <h2 class="sec-title">THE<br>STUDIO<br>BEHIND<br>THE SCORE</h2>
+        <p>
+          <strong>Score Maverick is a boutique music studio</strong> specialized in animation. We don't do generic — we dig into the world your team has built and find the musical truth that lives inside it.
+        </p>
+        <p>
+          From sweeping orchestral scores to gritty electronic soundscapes, we build original music that amplifies every frame. Our work has been featured across streaming platforms, festivals, and broadcast networks worldwide.
+        </p>
+        <p>
+          Every project gets a dedicated composer, a defined thematic language, and a team that doesn't clock out until the music is right.
+        </p>
+        <a href="#cta-section" class="btn-primary" style="margin-top: 0.5rem; display: inline-block;">Work With Us</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="sec-divider">
+  <div class="sec" id="process-sec">
+    <div class="eyebrow reveal">How It Works</div>
+    <h2 class="sec-title reveal">FROM BRIEF<br>TO FINAL MIX</h2>
+    <div class="process-grid">
+      <div class="proc-step reveal">
+        <div class="proc-num">01</div>
+        <div class="proc-title">Discovery Call</div>
+        <p class="proc-desc">We get inside your project — story, tone, references, audience. No templates. Every engagement starts from scratch.</p>
+      </div>
+      <div class="proc-step reveal d1">
+        <div class="proc-num">02</div>
+        <div class="proc-title">Concept Demo</div>
+        <p class="proc-desc">We deliver a thematic demo within 5 business days. You hear the musical direction before committing to full production.</p>
+      </div>
+      <div class="proc-step reveal d2">
+        <div class="proc-num">03</div>
+        <div class="proc-title">Production</div>
+        <p class="proc-desc">Full score production with regular check-ins. We iterate on your notes until every cue hits exactly right.</p>
+      </div>
+      <div class="proc-step reveal d3">
+        <div class="proc-num">04</div>
+        <div class="proc-title">Delivery</div>
+        <p class="proc-desc">Stems, full mixes, and all necessary licensing. Ready for post-production, broadcast, and distribution.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div id="cta-section">
+  <div class="cta-glow"></div>
+  <img src="brand_assets/Score_Maverick_Logo_Iso_White_Fin.png" alt="" class="cta-iso-mark" aria-hidden="true">
+  <div class="cta-inner">
+    <div class="eyebrow reveal" style="justify-content:center;">Let's Create</div>
+    <h2 class="cta-title reveal">YOUR STORY<br>DESERVES<br>A SCORE</h2>
+    <p class="cta-sub reveal">Tell us about your project. We'll come back with a thematic concept within 5 business days — no obligation, no templates.</p>
+    <div class="reveal">
+      <a href="mailto:hello@scoremaverick.com" class="btn-primary" style="font-size:0.82rem; padding: 1.1rem 3rem;">
+        Request a Concept Demo
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <img src="brand_assets/Score_Maverick_Logo_White_Fin.png" alt="Score Maverick">
+  <ul class="footer-social">
+    <li><a href="#">Instagram</a></li>
+    <li><a href="#">Vimeo</a></li>
+    <li><a href="#">SoundCloud</a></li>
+    <li><a href="#">LinkedIn</a></li>
+  </ul>
+  <span class="footer-copy">© 2025 Score Maverick. All rights reserved.</span>
+</footer>
+
+<script>
+// ── GRADIENT DOTS ──
+const dotsCanvas = document.getElementById('dots-canvas');
+const dctx = dotsCanvas.getContext('2d');
+
+const DOT_SPACING = 26;
+let dots = [];
+
+function resizeDots() {
+  dotsCanvas.width = dotsCanvas.offsetWidth;
+  dotsCanvas.height = dotsCanvas.offsetHeight;
+  buildDots();
+}
+
+function buildDots() {
+  dots = [];
+  const cols = Math.ceil(dotsCanvas.width / DOT_SPACING) + 2;
+  const rows = Math.ceil(dotsCanvas.height / DOT_SPACING) + 2;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      dots.push({
+        x: c * DOT_SPACING + (Math.random() - 0.5) * 10,
+        y: r * DOT_SPACING + (Math.random() - 0.5) * 10,
+        radius: Math.random() * 1.0 + 0.5,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.004 + Math.random() * 0.005,
+      });
+    }
+  }
+}
+
+resizeDots();
+window.addEventListener('resize', resizeDots);
+
+let gx = 0.55, gy = 0.5, dtt = 0;
+
+function drawDots() {
+  dctx.clearRect(0, 0, dotsCanvas.width, dotsCanvas.height);
+
+  // Drift the gradient hot spot slowly
+  const targetX = 0.5 + Math.sin(dtt * 0.00045) * 0.28;
+  const targetY = 0.5 + Math.cos(dtt * 0.00035) * 0.22;
+  gx += (targetX - gx) * 0.003;
+  gy += (targetY - gy) * 0.003;
+
+  const cx = dotsCanvas.width * gx;
+  const cy = dotsCanvas.height * gy;
+  const maxDist = Math.hypot(dotsCanvas.width, dotsCanvas.height) * 0.55;
+
+  dots.forEach(d => {
+    const pulse = (Math.sin(d.phase + dtt * d.speed) + 1) * 0.5;
+    const dist = Math.hypot(d.x - cx, d.y - cy);
+    const proximity = Math.max(0, 1 - dist / maxDist);
+    const proximity2 = proximity * proximity;
+
+    const alpha = 0.05 + pulse * 0.08 + proximity2 * 0.32;
+
+    // Blend from neutral grey → brand red based on proximity
+    const ri = Math.round(70 + (232 - 70) * proximity2);
+    const gi = Math.round(70 + (25  - 70) * proximity2);
+    const bi = Math.round(70 + (44  - 70) * proximity2);
+
+    dctx.beginPath();
+    dctx.arc(d.x, d.y, d.radius + pulse * 0.4, 0, Math.PI * 2);
+    dctx.fillStyle = `rgba(${ri},${gi},${bi},${alpha})`;
+    dctx.fill();
+  });
+
+  dtt++;
+  requestAnimationFrame(drawDots);
+}
+drawDots();
+
+// ── NAV SCROLL ──
+const nav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ── HERO CANVAS WAVEFORM ──
+const canvas = document.getElementById('hero-canvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+let t = 0;
+const waves = [
+  { amp: 65,  freq: 0.0075, speed: 0.011, alpha: 0.18, lw: 1.5, dy: 0 },
+  { amp: 38,  freq: 0.013,  speed: 0.02,  alpha: 0.28, lw: 1.0, dy: 25 },
+  { amp: 90,  freq: 0.005,  speed: 0.007, alpha: 0.07, lw: 2.5, dy: -30 },
+  { amp: 22,  freq: 0.021,  speed: 0.028, alpha: 0.22, lw: 0.8, dy: 12 },
+  { amp: 50,  freq: 0.009,  speed: 0.015, alpha: 0.12, lw: 1.2, dy: -10 },
+];
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Ambient glow on right
+  const grd = ctx.createRadialGradient(
+    canvas.width * 0.75, canvas.height * 0.5, 20,
+    canvas.width * 0.75, canvas.height * 0.5, canvas.width * 0.55
+  );
+  grd.addColorStop(0, 'rgba(232,25,44,0.055)');
+  grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Waveforms
+  const cy = canvas.height / 2;
+  waves.forEach(w => {
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(232,25,44,${w.alpha})`;
+    ctx.lineWidth = w.lw;
+    ctx.lineJoin = 'round';
+    for (let x = 0; x <= canvas.width; x += 3) {
+      const y = cy + w.dy
+        + Math.sin(x * w.freq + t * w.speed) * w.amp
+        + Math.sin(x * w.freq * 2.7 + t * w.speed * 1.4) * (w.amp * 0.28);
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  });
+
+  // Spectrum bars (right third)
+  const startX = canvas.width * 0.62;
+  for (let i = 0; i < 55; i++) {
+    const x = startX + i * 7.5;
+    if (x > canvas.width - 20) break;
+    const h =
+      Math.abs(Math.sin(i * 0.22 + t * 0.028)) * 110 +
+      Math.abs(Math.sin(i * 0.38 + t * 0.047)) * 55 +
+      Math.abs(Math.sin(i * 0.09 + t * 0.019)) * 35;
+    const a = 0.05 + (h / 200) * 0.16;
+    ctx.fillStyle = `rgba(232,25,44,${a})`;
+    ctx.fillRect(x, cy - h / 2, 3.5, h);
+  }
+
+  t++;
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ── SCROLL REVEAL ──
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+reveals.forEach(r => io.observe(r));
+</script>
+</body>
+</html>
